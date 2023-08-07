@@ -1,0 +1,36 @@
+gcloud run deploy rfpbot-cloudrun1 \
+  --source . \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated
+
+gcloud run deploy rfpbot --region us-central1 --image us-central1-docker.pkg.dev/analytics-ml-ai/rfpbot/app  --allow-unauthenticated
+
+
+gcloud artifacts repositories create rfpbot \
+    --repository-format=docker \
+    --location=us-central1 \
+    --description="rfpbotimages" \
+    --async
+
+docker build --tag=test .
+
+docker tag test us-central1-docker.pkg.dev/analytics-ml-ai/rfpbot/app:latest
+
+docker push us-central1-docker.pkg.dev/analytics-ml-ai/rfpbot/app
+    
+  curl -X POST http://localhost:8080 \
+  -H "Content-Type: application/json" \
+  -d @data.json
+
+  https://rfpbot-275f2ufmqq-uc.a.run.app
+
+curl -X POST https://rfpbot-275f2ufmqq-uc.a.run.app \
+  -H "Content-Type: application/json" \
+  -d @data1.json
+
+curl -X POST https://rfpbot-275f2ufmqq-uc.a.run.app \
+-H "Content-Type: application/json" \
+-d '{"question":"Please describe your data warehouse capabilities and why its good for a healthcare company"}'
+
+gcloud ai index-endpoints undeploy-index 4599257138987008000 --deployed-index-id=2561941257555279872 --region=us-central1
